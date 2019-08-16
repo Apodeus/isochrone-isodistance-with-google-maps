@@ -13,7 +13,6 @@ var isochrone = {
 	callback: false,
 	debug: false,
 	computation: {
-		errors: 0,
 		slices: 0,
 		cycles: 0,
 		cycle: 0,
@@ -100,7 +99,6 @@ var isochrone = {
 			{};
 			return this.computationCallback('KO', 'Missing callback');
 		}
-		this.computation.errors = 0;
 		this.computation.callback = parameters.callback;
 		if (!this.ready)
 		{
@@ -141,7 +139,7 @@ var isochrone = {
 		this.computation.precision = parseInt(parameters.precision || 5) / 100;
 		this.computation.system = parameters.system && parameters.system === 'imperial' ? google.maps.UnitSystem.IMPERIAL : google.maps.UnitSystem.METRIC;
 
-		/* Cut the circle in «slices» */
+		/* Cut the circle in Â«slicesÂ» */
 		this.computation.positions = [];
 		var radius = this.radius[this.computation.type][this.computation.mode] * this.computation.value / 1000000;
 		if (this.computation.system === 'imperial')
@@ -204,13 +202,6 @@ var isochrone = {
 		{
 			if (result !== 'OK')
 			{
-				if (result === 'OVER_QUERY_LIMIT' && computation.errors++ <= 10)
-				{
-					computation.cycle--;
-					isochrone.requests = Math.max(0.5, isochrone.requests - 0.5);
-					setTimeout(isochrone.cycle, 2000);
-					return false;
-				}
 				return isochrone.computationCallback(result);
 			}
 			if ((typeof data.rows[0].elements) === 'undefined' || data.rows[0].elements.length !== destinations.length)
@@ -253,17 +244,17 @@ var isochrone = {
 					/* Recompute radius */
 					if (!position.min.radius)
 					{
-						/* Position is relative to the max found: apply «règle de trois» (Cross-multiplication) */
+						/* Position is relative to the max found: apply Â«rÃ¨gle de troisÂ» (Cross-multiplication) */
 						position.radius = position.max.radius * computation.value / position.max.value;
 					}
 					else if (!position.max.radius)
 					{
-						/* Position is relative to the min found: apply «règle de trois» (Cross-multiplication) */
+						/* Position is relative to the min found: apply Â«rÃ¨gle de troisÂ» (Cross-multiplication) */
 						position.radius = position.min.radius * computation.value / position.min.value;
 					}
 					else
 					{
-						/* Use «moyenne pondérée» (weighted arithmetic mean) */
+						/* Use Â«moyenne pondÃ©rÃ©eÂ» (weighted arithmetic mean) */
 						/* weights are the difference between expected value and min/max values, inversed (less the distance is best) */
 						minWeight = 1 / Math.abs(position.min.value - computation.value);
 						maxWeight = 1 / Math.abs(position.max.value - computation.value);
